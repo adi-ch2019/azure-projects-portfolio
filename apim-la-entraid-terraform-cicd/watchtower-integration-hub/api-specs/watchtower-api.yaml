@@ -1,0 +1,107 @@
+openapi: 3.0.1
+info:
+  title: Watchtower Justice League API
+  description: API for coordinating Justice League superhero operations
+  version: "1.0"
+  x-ms-identifiers: []
+servers:
+  - url: https://watchtower-api.azure-api.net/v1
+paths:
+  /incidents:
+    post:
+      summary: Report a new incident
+      operationId: report-incident
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Incident"
+      responses:
+        "200":
+          description: Incident reported successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  incidentId:
+                    type: string
+                  status:
+                    type: string
+                  assignedHero:
+                    type: string
+      x-ms-examples:
+        Example:
+          request:
+            body:
+              incidentType: "ALIEN_INVASION"
+              location: "Metropolis"
+              severity: 5
+              description: "General Zod sighted"
+          responses:
+            "200":
+              body:
+                incidentId: "JLA-2024-001"
+                status: "Assigned"
+                assignedHero: "Superman"
+  
+  /status/{hero}:
+    get:
+      summary: Get hero availability status
+      operationId: get-hero-status
+      parameters:
+        - name: hero
+          in: path
+          required: true
+          schema:
+            type: string
+          x-ms-parameter-location: method
+      responses:
+        "200":
+          description: Hero status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HeroStatus"
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize
+          scopes:
+            api_access: Access Watchtower APIs
+  schemas:
+    Incident:
+      type: object
+      properties:
+        incidentType:
+          type: string
+          enum:
+            - BANK_ROBBERY
+            - ALIEN_INVASION
+            - METEOR_STRIKE
+            - SUPERVILLAIN_ATTACK
+        location:
+          type: string
+        severity:
+          type: integer
+          minimum: 1
+          maximum: 5
+        description:
+          type: string
+    HeroStatus:
+      type: object
+      properties:
+        hero:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, IN_COMBAT, OFFWORLD]
+        lastLocation:
+          type: string
+        lastSeen:
+          type: string
+          format: date-time

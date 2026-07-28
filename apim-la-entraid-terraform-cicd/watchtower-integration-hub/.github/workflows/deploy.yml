@@ -1,0 +1,77 @@
+name: 🦸 Watchtower Deployment
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # ===== INFRASTRUCTURE =====
+  infrastructure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+      
+      - name: Terraform Apply
+        run: |
+          cd infrastructure
+          terraform init
+          terraform apply -auto-approve
+
+  # ===== DEPLOY LOGIC APPS =====
+  deploy-logic-apps:
+    needs: infrastructure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Deploy Gotham Patrol Logic App
+        uses: azure/logicapps-deploy@v2
+        with:
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          logic-app-name: ${{ env.LOGIC_GOTHAM }}
+          file-path: logic-apps/gotham-patrol.json
+      
+      - name: Deploy Krypton Alert Logic App
+        uses: azure/logicapps-deploy@v2
+        with:
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          logic-app-name: ${{ env.LOGIC_KRYPTON }}
+          file-path: logic-apps/krypton-alert.json
+
+  # ===== DEPLOY API MANAGEMENT =====
+  deploy-apim:
+    needs: [infrastructure, deploy-logic-apps]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Import API Specification
+        uses: azure/API-Management-Import-API@v1
+        with:
+          api-management-name: ${{ env.APIM_NAME }}
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          api-spec: api-specs/watchtower-api.yaml
+          api-name: "Watchtower-API"
+          api-display-name: "Watchtower Justice League API"
