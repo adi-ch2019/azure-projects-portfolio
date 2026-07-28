@@ -1,0 +1,40 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "triggers": {
+      "When_a_HTTP_request_is_received": {
+        "type": "Request",
+        "inputs": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "hero": { "type": "string" },
+              "message": { "type": "string" },
+              "crisis_level": { "type": "string", "enum": ["HIGH", "MEDIUM", "LOW"] }
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "Send_Kryptonian_Alert": {
+        "type": "Http",
+        "inputs": {
+          "method": "POST",
+          "uri": "https://krypton-alerts.azurewebsites.net/api/alert",
+          "headers": {
+            "X-Krypton-API-Key": "@{parameters('krypton_api_key')}"
+          },
+          "body": {
+            "hero": "@triggerBody()?.hero",
+            "message": "@triggerBody()?.message",
+            "timestamp": "@utcNow()",
+            "crisis_level": "@triggerBody()?.crisis_level"
+          }
+        }
+      }
+    }
+  }
+}
