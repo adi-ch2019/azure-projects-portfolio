@@ -74,4 +74,4 @@ jobs:
           resource-group: ${{ env.RESOURCE_GROUP }}
           api-spec: api-specs/watchtower-api.yaml
           api-name: "Watchtower-API"
-          api-display-name: "Watchtower Justice League API"
+          api-display-name: "Watchtower Justice League API"x
