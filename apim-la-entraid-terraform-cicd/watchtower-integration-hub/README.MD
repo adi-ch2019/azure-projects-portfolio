@@ -11,39 +11,6 @@
 - **Logic Apps**: Workflow orchestration for Gotham, Krypton, and GL Corps
 - **Key Vault**: Securing Kryptonian tech secrets
 
-## 🏗️ Architecture
-
-Justice League App (Client)
-│
-▼
-🛡️ Microsoft Entra ID
-(Hall of Justice Auth)
-│
-▼
-🌐 API Management Gateway
-(Watchtower API Gateway)
-│
-▼
-┌───────────────┼───────────────┐
-▼ ▼ ▼
-🦇 Gotham 🦸 Krypton 🧨 Green Lantern
-Logic App Logic App Logic App
-│ │ │
-▼ ▼ ▼
-Gotham Police Kryptonian GL Corps
-API (Backend) Tech API API (Backend)
-
-
-## 📊 Backing Services
-
-| Service | DC Comics Role | Azure Service |
-|---------|----------------|---------------|
-| Identity | Hall of Justice Authentication | Microsoft Entra ID |
-| API Gateway | Watchtower Communications Hub | Azure API Management |
-| Orchestration | Mission Control | Azure Logic Apps |
-| Secrets | Fortress of Solitude Vault | Azure Key Vault |
-| Integration | Mother Box Connectivity | Azure Integration Services |
-
 ## 🚀 Quick Start
 
 ```bash
